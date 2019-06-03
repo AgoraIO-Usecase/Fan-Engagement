@@ -1,0 +1,291 @@
+package io.agora.live_streaming.activity;
+
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.lang.ref.WeakReference;
+import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.List;
+
+import io.agora.live_streaming.AGApplication;
+import io.agora.live_streaming.R;
+import io.agora.live_streaming.adapter.ItemDecor;
+import io.agora.live_streaming.adapter.MessageAdapter;
+import io.agora.live_streaming.manager.RTCManager;
+import io.agora.live_streaming.manager.RTMManager;
+import io.agora.live_streaming.util.Constant;
+import io.agora.rtc.Constants;
+import io.agora.rtc.video.VideoCanvas;
+import io.agora.rtm.RtmChannelMember;
+import io.agora.rtm.RtmMessage;
+
+public class LiveActivity extends Activity implements RTMManager.IRtmCallBack, RTCManager.IRtcCallBack {
+
+    private RTCManager mRTCManager;
+    private RTMManager mRTMManager;
+    private FrameLayout mAudienceFL;
+    private FrameLayout mBroadcasterFL;
+    private FrameLayout mStreamingFL;
+    private EditText mChat;
+    private ImageView mPlus;
+    private ImageView mExit;
+    private RecyclerView mChatRoom;
+    private ImageView mBroadcasterPH;
+    private MessageAdapter mMessageAdapter;
+    private List<String> mMessageDataSet = new ArrayList<>();
+    private boolean mStreamingOn = false;
+    private boolean mBroadcasterOn = false;
+    private SurfaceView mStreamingView;
+    private SurfaceView mBroadcasterView;
+
+    private static final String[] REQUESTED_PERMISSIONS = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private static final int PERMISSION_REQ_ID = 1024;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_live);
+
+        if (checkSelfPermission(REQUESTED_PERMISSIONS[0], PERMISSION_REQ_ID) &&
+                checkSelfPermission(REQUESTED_PERMISSIONS[1], PERMISSION_REQ_ID) &&
+                checkSelfPermission(REQUESTED_PERMISSIONS[2], PERMISSION_REQ_ID)) {
+            init();
+        }
+    }
+
+    private void init() {
+        mAudienceFL = (FrameLayout) findViewById(R.id.audience);
+        mBroadcasterFL = (FrameLayout) findViewById(R.id.broadcaster);
+        mStreamingFL = (FrameLayout) findViewById(R.id.streaming);
+        mChat = (EditText) findViewById(R.id.chat);
+        mPlus = (ImageView) findViewById(R.id.plus);
+        mExit = (ImageView) findViewById(R.id.exit);
+        mBroadcasterPH = (ImageView) findViewById(R.id.broadcaster_place_holder);
+
+        mChatRoom = (RecyclerView) findViewById(R.id.chat_room);
+        mChatRoom.setHasFixedSize(true);
+        mMessageAdapter = new MessageAdapter(new WeakReference<Context>(this), mMessageDataSet);
+        mChatRoom.setAdapter(mMessageAdapter);
+        mChatRoom.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mChatRoom.addItemDecoration(new ItemDecor());
+
+        mExit.setVisibility(View.GONE);
+        mChat.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                Log.d(Constant.DEBUG_LOG_TAG, "onEditoraction");
+                if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED || actionId == EditorInfo.IME_ACTION_SEND
+                        || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                    String message = mChat.getText().toString();
+                    mRTMManager.sendChannelMessage(message);
+                    mChat.setText("");
+                    mChat.clearFocus();
+                    Log.d(Constant.DEBUG_LOG_TAG, "enter detected");
+
+                    mMessageDataSet.add(Constant.RTM_UID_AUDIENCE + ": " + message);
+                    if (mMessageDataSet.size() > 5) { // max value is 5
+                        int len = mMessageDataSet.size() - 6;
+                        for (int i = 0; i < len; i++) {
+                            mMessageDataSet.remove(i);
+                        }
+                    }
+
+                    mMessageAdapter.updateDataSet(mMessageDataSet);
+                    mChatRoom.smoothScrollToPosition(mMessageAdapter.getItemCount() - 1);
+                }
+
+                return true;
+             }
+         });
+
+        mRTCManager = AGApplication.the().getRTCManager();
+        mRTMManager = AGApplication.the().getRTMManager();
+
+        mRTMManager.registerCallBack(this);
+        mRTCManager.registerCallBack(this);
+
+        mRTCManager.joinChannel(Constant.CHANNEL_NAME, Constant.UID_AUDIENCE);
+        mRTMManager.createAndJoinChannel(Constant.RTM_UID_AUDIENCE, Constant.CHANNEL_NAME);
+
+    }
+
+    public void onPlusClicked(View v) {
+        //showToast("Application has been sent. Please wait for the host's approval");
+        showMyself();
+        //mRTMManager.sendPeerMessage(Constant.RTM_UID_BROADCASTER, Constant.REQUEST_MESSAGE);
+    }
+
+    private void showMyself() {
+        mPlus.setVisibility(View.GONE);
+        mRTCManager.setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
+        setupLocalVideo();
+        mExit.setVisibility(View.VISIBLE);
+    }
+
+    public void onExitClicked(View v) {
+        mPlus.setVisibility(View.VISIBLE);
+        mRTCManager.setClientRole(Constants.CLIENT_ROLE_AUDIENCE);
+        mExit.setVisibility(View.GONE);
+        mRTCManager.enableLocalVideo(false);
+        mAudienceFL.removeAllViews();
+    }
+
+    private void setupLocalVideo() {
+        Log.d(Constant.DEBUG_LOG_TAG, "setuplocalvideo");
+        SurfaceView camV = mRTCManager.getRtcEngine().CreateRendererView(getApplicationContext());
+        camV.setZOrderOnTop(true);
+        camV.setZOrderMediaOverlay(true);
+        mAudienceFL.addView(camV, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        mRTCManager.setupLocalVideo(new VideoCanvas(camV, VideoCanvas.RENDER_MODE_HIDDEN, Constant.UID_AUDIENCE));
+        mRTCManager.enableLocalVideo(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mRTMManager.unRegisterCallBack();
+        mRTCManager.unRegisterCallBack();
+        mRTCManager.leaveAndDestroy();
+        mRTMManager.leaveAndReleaseChannel();
+
+    }
+
+    public void onChannelMessageReceived(final RtmMessage rtmMessage, final RtmChannelMember rtmChannelMember) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMessageDataSet.add(rtmChannelMember.getUserId() + ": " + rtmMessage.getText());
+                if (mMessageDataSet.size() > 5) { // max value is 5
+                    int len = mMessageDataSet.size() - 6;
+                    for (int i = 0; i < len; i++) {
+                        mMessageDataSet.remove(i);
+                    }
+                }
+
+                mMessageAdapter.updateDataSet(mMessageDataSet);
+                mChatRoom.smoothScrollToPosition(mMessageAdapter.getItemCount() - 1);
+            }
+        });
+
+    }
+
+    public void onPeerMessageReceived(final RtmMessage rtmMessage, final String peerId) {
+        /*runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (peerId.equals(Constant.RTM_UID_BROADCASTER)) {
+                    if (rtmMessage.getText().equals(Constant.ALLOW_MESSAGE)) {
+                        showMyself();
+                    } else {
+                        showToast("The host rejected your applicaton.");
+                    }
+                }
+            }
+        });*/
+    }
+
+    public void onFirstRemoteVideoDecoded(final int uid, int width, int height, int elapsed) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (uid == Constant.UID_STREAMING) {
+                    mStreamingView = mRTCManager.getRtcEngine().CreateRendererView(getApplicationContext());
+                    mStreamingOn = true;
+                    mStreamingView.setZOrderOnTop(true);
+                    mStreamingView.setZOrderMediaOverlay(true);
+                    mStreamingFL.addView(mStreamingView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                    mRTCManager.setupRemoteVideo(new VideoCanvas(mStreamingView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
+                } else {
+                    mBroadcasterOn = true;
+                    mBroadcasterPH.setVisibility(View.GONE);
+                    mBroadcasterView = mRTCManager.getRtcEngine().CreateRendererView(getApplicationContext());
+                    mBroadcasterView.setZOrderOnTop(true);
+                    mBroadcasterView.setZOrderMediaOverlay(true);
+                    mBroadcasterFL.addView(mBroadcasterView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                    mRTCManager.setupRemoteVideo(new VideoCanvas(mBroadcasterView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
+                }
+
+            }
+        });
+    }
+
+    public void onUserJoined(int uid, int elapsed) {
+
+    }
+
+    public void onUserOffline(final int uid, int reason) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (uid == Constant.UID_STREAMING) {
+                    mStreamingOn = false;
+                    mStreamingFL.removeAllViews();
+                } else {
+                    mBroadcasterOn = false;
+                    mBroadcasterFL.removeAllViews();
+                    mBroadcasterPH.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+    }
+
+    private void showToast(final String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
+
+    private boolean checkSelfPermission(String permission, int requestCode) {
+        Log.d(Constant.DEBUG_LOG_TAG, "checkSelfPermission " + permission + " " + requestCode);
+        if (ContextCompat.checkSelfPermission(this,
+                permission)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    REQUESTED_PERMISSIONS,
+                    requestCode);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+        Log.d(Constant.DEBUG_LOG_TAG, "onRequestPermissionsResult " + grantResults[0] + " " + requestCode);
+
+        switch (requestCode) {
+            case PERMISSION_REQ_ID: {
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED || grantResults[1] != PackageManager.PERMISSION_GRANTED || grantResults[2] != PackageManager.PERMISSION_GRANTED) {
+                    finish();
+                    break;
+                }
+                init();
+                break;
+            }
+        }
+    }
+}

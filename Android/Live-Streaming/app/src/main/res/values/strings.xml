@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Live Streaming</string>
+
+    <string name="hint_channel_name">Channel Name</string>
+
+    <!-- PLEASE KEEP THIS App ID IN SAFE PLACE -->
+    <!-- Get your own App ID at https://dashboard.agora.io/ -->
+    <!-- After you entered the App ID, remove <##> outside of Your App ID -->
+    <!-- For formal released project, please use Security Keys/Token
+        https://docs.agora.io/en/Interactive%20Broadcast/token?platform=All%20Platforms -->
+    <string name="agora_app_id"><#Your APP ID#></string>
+</resources>
