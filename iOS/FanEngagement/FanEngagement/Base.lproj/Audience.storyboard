@@ -104,9 +104,22 @@
                                     <action selector="doClosePressed:" destination="D7Y-3I-Qdf" eventType="touchUpInside" id="RZd-f5-c3P"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hgf-oM-xT1">
+                                <rect key="frame" x="184" y="318" width="55" height="55"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="55" id="PNc-wk-ZMl"/>
+                                    <constraint firstAttribute="height" constant="55" id="uzj-sl-QF4"/>
+                                </constraints>
+                                <state key="normal" image="btn-microphone"/>
+                                <state key="selected" image="btn-microphone-off"/>
+                                <connections>
+                                    <action selector="doMuteAudioPressed:" destination="D7Y-3I-Qdf" eventType="touchUpInside" id="oN0-BH-ulm"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.098039215686274508" green="0.098039215686274508" blue="0.098039215686274508" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
+                            <constraint firstItem="hgf-oM-xT1" firstAttribute="bottom" secondItem="Lsz-dT-Ibn" secondAttribute="bottom" id="7Pz-S1-RNT"/>
                             <constraint firstItem="s1v-xQ-Tea" firstAttribute="bottom" secondItem="qtb-R3-NEs" secondAttribute="bottom" id="9l2-8X-PcL"/>
                             <constraint firstItem="Lsz-dT-Ibn" firstAttribute="top" secondItem="1Y9-Ps-LPD" secondAttribute="bottom" constant="10" id="9oW-ke-4Wg"/>
                             <constraint firstItem="Lsz-dT-Ibn" firstAttribute="height" secondItem="1Y9-Ps-LPD" secondAttribute="height" id="DfC-nq-zDf"/>
@@ -117,6 +130,7 @@
                             <constraint firstItem="jUp-m9-btC" firstAttribute="leading" secondItem="pen-dF-dJO" secondAttribute="leading" id="MOx-Vz-Nw0"/>
                             <constraint firstItem="Yq3-1A-4Bq" firstAttribute="top" secondItem="1Y9-Ps-LPD" secondAttribute="top" id="NZa-0R-mVd"/>
                             <constraint firstItem="pen-dF-dJO" firstAttribute="trailing" secondItem="v22-cJ-BOO" secondAttribute="trailing" id="PRa-cl-SjA"/>
+                            <constraint firstItem="hgf-oM-xT1" firstAttribute="trailing" secondItem="Lsz-dT-Ibn" secondAttribute="trailing" id="Vd5-A0-DF5"/>
                             <constraint firstItem="5NM-gV-ygV" firstAttribute="leading" secondItem="1Y9-Ps-LPD" secondAttribute="leading" id="ZTf-0O-2br"/>
                             <constraint firstItem="s1v-xQ-Tea" firstAttribute="top" secondItem="Yq3-1A-4Bq" secondAttribute="bottom" constant="8" id="asB-NP-so7"/>
                             <constraint firstItem="1Y9-Ps-LPD" firstAttribute="leading" secondItem="pen-dF-dJO" secondAttribute="leading" constant="20" id="bJt-XZ-jh5"/>
@@ -204,6 +218,8 @@
     <resources>
         <image name="add" width="42" height="42"/>
         <image name="broadTag" width="112" height="112"/>
+        <image name="btn-microphone" width="40" height="40"/>
+        <image name="btn-microphone-off" width="40" height="40"/>
         <image name="close" width="128" height="128"/>
     </resources>
 </document>

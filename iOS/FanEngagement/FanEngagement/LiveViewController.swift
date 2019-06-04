@@ -29,7 +29,7 @@ class LiveViewController: UIViewController {
     
     @IBOutlet weak var rtmpView: UIView!
     @IBOutlet weak var closeButton: UIButton!
-   
+    
     private lazy var agoraKit: AgoraRtcEngineKit = {
         let kit = AgoraRtcEngineKit.shared(self)
         #if !IS_BROADCASTER
@@ -45,6 +45,21 @@ class LiveViewController: UIViewController {
         #endif
         return kit
     }()
+    
+    private var isMuteAudio: Bool = false {
+        didSet {
+            agoraKit.muteLocalAudioStream(isMuteAudio)
+            isLowerRTMPAudio = !isMuteAudio
+        }
+    }
+    
+    private var isLowerRTMPAudio: Bool = false {
+        didSet {
+            let volume = isLowerRTMPAudio ? 5 : 200
+            let parameter = "{\"che.audio.playout.uid.volume\": {\"uid\": 666, \"volume\": \(volume)}}"
+            agoraKit.setParameters(parameter)
+        }
+    }
     
     private let gameStreamingUid: UInt = 666
     private var barrageVC: BarrageViewController?
@@ -94,6 +109,11 @@ class LiveViewController: UIViewController {
         agoraKit.setClientRole(.broadcaster)
         addLocalPreview()
         #endif
+    }
+    
+    @IBAction func doMuteAudioPressed(_ sender: UIButton) {
+        sender.isSelected.toggle()
+        isMuteAudio.toggle()
     }
 }
 
@@ -181,6 +201,7 @@ extension LiveViewController: AgoraRtcEngineDelegate {
         print("firstRemoteVideoDecodedOf uid: \(uid)")
         if uid == gameStreamingUid {
             setupRTMPVideoStream()
+            isLowerRTMPAudio = !isMuteAudio
         } else {
             setupRemoteVideoStream(uid: uid)
         }
@@ -193,8 +214,14 @@ extension LiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, streamInjectedStatusOfUrl url: String, uid: UInt, status: AgoraInjectStreamStatus) {
         print("streamInjectedStatusOfUrl status: \(status.rawValue)")
     }
-}
 
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
+        print ("the uid :\(uid) is muteLocalAudioStream")
+        if (uid != gameStreamingUid) {
+            isLowerRTMPAudio = !muted
+        }
+    }
+}
 extension LiveViewController: AgoraRtmChannelDelegate {
     func channel(_ channel: AgoraRtmChannel, messageReceived message: AgoraRtmMessage, from member: AgoraRtmMember) {
         barrageVC?.lauchBarrage(text: message.text)
