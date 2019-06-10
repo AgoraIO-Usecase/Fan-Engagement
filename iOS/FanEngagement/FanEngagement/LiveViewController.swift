@@ -55,7 +55,7 @@ class LiveViewController: UIViewController {
     
     private var isLowerRTMPAudio: Bool = false {
         didSet {
-            let volume = isLowerRTMPAudio ? 5 : 200
+            let volume = isLowerRTMPAudio ? 5 : 90
             let parameter = "{\"che.audio.playout.uid.volume\": {\"uid\": 666, \"volume\": \(volume)}}"
             agoraKit.setParameters(parameter)
         }
