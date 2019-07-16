@@ -20,6 +20,30 @@ protocol LiveVCDelegate: NSObjectProtocol {
 }
 #endif
 
+struct User {
+    var uid:UInt
+    var muted:Bool
+    
+    init(uid: UInt) {
+        self.uid = uid
+        muted = false
+    }
+}
+
+struct Message {
+    var sender: String
+    var content: String
+}
+
+class MessageCell: UITableViewCell {
+    @IBOutlet weak var contentLabel: UILabel!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+}
+
 class LiveViewController: UIViewController {
     @IBOutlet weak var broadcasterTagImageView: UIImageView!
     @IBOutlet weak var broadcasterView: UIView!
@@ -29,6 +53,9 @@ class LiveViewController: UIViewController {
     
     @IBOutlet weak var rtmpView: UIView!
     @IBOutlet weak var closeButton: UIButton!
+    @IBOutlet weak var chatView: UITableView!
+    @IBOutlet weak var toggleBtn: UIButton!
+    @IBOutlet weak var fullscreenBtn: UIButton!
     
     private lazy var agoraKit: AgoraRtcEngineKit = {
         let kit = AgoraRtcEngineKit.shared(self)
@@ -49,7 +76,25 @@ class LiveViewController: UIViewController {
     private var isMuteAudio: Bool = false {
         didSet {
             agoraKit.muteLocalAudioStream(isMuteAudio)
-            isLowerRTMPAudio = !isMuteAudio
+            adjustRTMPVolume()
+        }
+    }
+    
+    private var isChatCollapsed: Bool = true {
+        didSet {
+            let constraint = view.constraints.first { $0.identifier == "chat.right.offset" }
+            constraint?.constant = isChatCollapsed ? -184 : 0
+            chatView.setNeedsUpdateConstraints()
+            toggleBtn.setImage(isChatCollapsed ? UIImage(named: "expand") : UIImage(named: "collapse"), for: .normal)
+        }
+    }
+    
+    private var isFullscreen: Bool = false {
+        didSet {
+            let constraint = view.constraints.first { $0.identifier == "broadcaster.left.offset" }
+            constraint?.constant = isFullscreen ? -175 : 20
+            view.setNeedsUpdateConstraints()
+            fullscreenBtn.setImage(isFullscreen ? UIImage(named: "quitfullscreen") : UIImage(named: "fullscreen"), for: .normal)
         }
     }
     
@@ -62,6 +107,12 @@ class LiveViewController: UIViewController {
     }
     
     private let gameStreamingUid: UInt = 666
+    private var users:[User] = [] {
+        didSet {
+            adjustRTMPVolume()
+        }
+    }
+    private var messages:[Message] = []
     private var barrageVC: BarrageViewController?
     private var textVC: TextViewController?
     
@@ -72,6 +123,8 @@ class LiveViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        chatView.contentInset.top = 20
+        chatView.contentInset.bottom = 20
         updateViews()
         joinChannel()
     }
@@ -115,6 +168,37 @@ class LiveViewController: UIViewController {
         sender.isSelected.toggle()
         isMuteAudio.toggle()
     }
+    
+    @IBAction func doToggleChatView(_ sender: UIButton) {
+        isChatCollapsed.toggle()
+    }
+    
+    @IBAction func doToggleFullscreen(_ sender:UIButton) {
+        isFullscreen.toggle()
+    }
+}
+
+extension LiveViewController:UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell:MessageCell = tableView.dequeueReusableCell(withIdentifier: "MSG_CELL") as! MessageCell
+        let msg = messages[indexPath.row]
+        let uidAttributes = [NSAttributedString.Key.foregroundColor: UIColor(hexString: "#3575E2")] as [NSAttributedString.Key : Any]
+        let contentAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white] as [NSAttributedString.Key : Any]
+        let attrstr = NSMutableAttributedString(string: "\(msg.sender)   ", attributes:uidAttributes)
+        attrstr.append(NSAttributedString(string: msg.content, attributes: contentAttributes))
+        cell.contentLabel?.attributedText = attrstr
+        return cell
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    
 }
 
 private extension LiveViewController {
@@ -190,6 +274,14 @@ private extension LiveViewController {
     func remoteVideoStreamOffline(uid: UInt) {
         broadcasterTagImageView.isHidden = false
     }
+    
+    func adjustRTMPVolume() {
+        //if all other users muted, recover volume; otherwise keep low
+        let unmutedUsers = users.filter { (user) -> Bool in
+            return !user.muted
+        }
+        isLowerRTMPAudio = !isMuteAudio ||  unmutedUsers.count > 0 ? true : false
+    }
 }
 
 extension LiveViewController: AgoraRtcEngineDelegate {
@@ -199,16 +291,26 @@ extension LiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, firstRemoteVideoDecodedOfUid uid: UInt, size: CGSize, elapsed: Int) {
         print("firstRemoteVideoDecodedOf uid: \(uid)")
+        
         if uid == gameStreamingUid {
             setupRTMPVideoStream()
-            isLowerRTMPAudio = !isMuteAudio
         } else {
             setupRemoteVideoStream(uid: uid)
         }
     }
     
+    func rtcEngine(_ engine: AgoraRtcEngineKit, firstRemoteAudioFrameDecodedOfUid uid: UInt, elapsed: Int) {
+        // add uid into users array
+        users.append(User(uid: uid))
+    }
+    
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
         remoteVideoStreamOffline(uid: uid)
+        //remove uid from users array
+        guard let idx = users.firstIndex(where: { (user) -> Bool in
+            return user.uid == uid
+        }) else {return}
+        users.remove(at: idx)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, streamInjectedStatusOfUrl url: String, uid: UInt, status: AgoraInjectStreamStatus) {
@@ -217,14 +319,25 @@ extension LiveViewController: AgoraRtcEngineDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
         print ("the uid :\(uid) is muteLocalAudioStream")
-        if (uid != gameStreamingUid) {
-            isLowerRTMPAudio = !muted
-        }
+        
+        //set mute flag for uid
+        guard var user = users.first(where: { (user) -> Bool in
+            return user.uid == uid
+        }) else {return}
+        
+        user.muted = muted
+        adjustRTMPVolume()
     }
 }
 extension LiveViewController: AgoraRtmChannelDelegate {
     func channel(_ channel: AgoraRtmChannel, messageReceived message: AgoraRtmMessage, from member: AgoraRtmMember) {
         barrageVC?.lauchBarrage(text: message.text)
+        
+        //show chat message in right panel
+        messages.append(Message(sender: member.userId, content: message.text))
+        chatView.beginUpdates()
+        chatView.insertRows(at: [IndexPath(row: messages.count - 1, section: 0)], with: .automatic)
+        chatView.endUpdates()
     }
 }
 
