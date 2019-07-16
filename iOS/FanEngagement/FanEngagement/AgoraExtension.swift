@@ -10,8 +10,8 @@ import Foundation
 import AgoraRtcEngineKit
 import AgoraRtmKit
 
-let appId: String = <#YOUR APPID#>
-let channelId: String = "FanEngagement"
+let appId: String = <#APPID#>
+var channelId: String = ""
 
 extension AgoraRtcEngineKit {
     static func shared(_ delegate: AgoraRtcEngineDelegate? = nil) -> AgoraRtcEngineKit {

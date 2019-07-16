@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		035A384122DE5D9A00127F93 /* BroadcasterMain.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 035A384022DE5D9A00127F93 /* BroadcasterMain.storyboard */; };
+		035A384322DE652700127F93 /* IndexViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035A384222DE652700127F93 /* IndexViewController.swift */; };
+		035A384622DE693400127F93 /* Broadcaster.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A704E2D9229E996100E876D0 /* Broadcaster.storyboard */; };
+		035A384722DE693400127F93 /* BroadcasterMain.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 035A384022DE5D9A00127F93 /* BroadcasterMain.storyboard */; };
+		035A384D22DE6C9D00127F93 /* AudienceMain.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 035A384C22DE6C9D00127F93 /* AudienceMain.storyboard */; };
+		035A384E22DE6C9D00127F93 /* AudienceMain.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 035A384C22DE6C9D00127F93 /* AudienceMain.storyboard */; };
+		035A384F22DE6D2600127F93 /* IndexViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035A384222DE652700127F93 /* IndexViewController.swift */; };
 		A7702933229EB18B00745269 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7702931229EB18B00745269 /* LaunchScreen.storyboard */; };
 		A7702942229FAB0900745269 /* AgoraExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7702940229FAB0900745269 /* AgoraExtension.swift */; };
 		A7702956229FBA9400745269 /* UIExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7702954229FBA9400745269 /* UIExtension.swift */; };
@@ -53,6 +60,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		035A384022DE5D9A00127F93 /* BroadcasterMain.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BroadcasterMain.storyboard; sourceTree = "<group>"; };
+		035A384222DE652700127F93 /* IndexViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexViewController.swift; sourceTree = "<group>"; };
+		035A384C22DE6C9D00127F93 /* AudienceMain.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = AudienceMain.storyboard; sourceTree = "<group>"; };
 		A704E2D5229E996100E876D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A704E2D7229E996100E876D0 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		A704E2DA229E996100E876D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Broadcaster.storyboard; sourceTree = "<group>"; };
@@ -147,6 +157,7 @@
 		A704E2D4229E996100E876D0 /* FanEngagement */ = {
 			isa = PBXGroup;
 			children = (
+				035A384222DE652700127F93 /* IndexViewController.swift */,
 				A704E2D7229E996100E876D0 /* MainViewController.swift */,
 				A770293E229FA97F00745269 /* GuideViewController.swift */,
 				A770293A229EC5AA00745269 /* LiveViewController.swift */,
@@ -155,6 +166,8 @@
 				A7702940229FAB0900745269 /* AgoraExtension.swift */,
 				A7702954229FBA9400745269 /* UIExtension.swift */,
 				A704E2D9229E996100E876D0 /* Broadcaster.storyboard */,
+				035A384022DE5D9A00127F93 /* BroadcasterMain.storyboard */,
+				035A384C22DE6C9D00127F93 /* AudienceMain.storyboard */,
 				A77029B4229FE30800745269 /* Audience.storyboard */,
 				A7702921229EB0E700745269 /* Supporting Files */,
 			);
@@ -290,9 +303,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				035A384622DE693400127F93 /* Broadcaster.storyboard in Resources */,
+				035A384722DE693400127F93 /* BroadcasterMain.storyboard in Resources */,
 				A7702969229FD67D00745269 /* Assets.xcassets in Resources */,
 				A7702933229EB18B00745269 /* LaunchScreen.storyboard in Resources */,
 				A77029BE22A3D05E00745269 /* Audience.storyboard in Resources */,
+				035A384E22DE6C9D00127F93 /* AudienceMain.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,8 +318,10 @@
 			files = (
 				A77029B7229FE38700745269 /* Audience.storyboard in Resources */,
 				A770299A229FDB2700745269 /* LaunchScreen.storyboard in Resources */,
+				035A384122DE5D9A00127F93 /* BroadcasterMain.storyboard in Resources */,
 				A77029B0229FDC1E00745269 /* Assets.xcassets in Resources */,
 				A77029B2229FDE0A00745269 /* Broadcaster.storyboard in Resources */,
+				035A384D22DE6C9D00127F93 /* AudienceMain.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,6 +332,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				035A384F22DE6D2600127F93 /* IndexViewController.swift in Sources */,
 				A7702967229FD5F900745269 /* UIView+ExProperty.m in Sources */,
 				A77029BD22A3CFEB00745269 /* BarrageViewController.swift in Sources */,
 				A7702956229FBA9400745269 /* UIExtension.swift in Sources */,
@@ -338,6 +357,7 @@
 				A77029B1229FDC2200745269 /* UIView+ExProperty.m in Sources */,
 				A77029AF229FDC1C00745269 /* UIColor+Hex.m in Sources */,
 				A77029A2229FDB5800745269 /* LiveViewController.swift in Sources */,
+				035A384322DE652700127F93 /* IndexViewController.swift in Sources */,
 				A77029B922A3AE3800745269 /* BarrageViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
