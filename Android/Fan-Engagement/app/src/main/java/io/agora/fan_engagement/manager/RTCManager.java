@@ -42,6 +42,15 @@ public class RTCManager {
             mIRtcCallBack.onUserOffline(uid, reason);
         }
 
+        @Override
+        public void onFirstRemoteAudioFrame(int uid, int elapsed) {
+            mIRtcCallBack.onFirstRemoteAudioDecoded(uid, elapsed);
+        }
+
+        @Override
+        public void onUserMuteAudio(int uid, boolean muted) {
+            mIRtcCallBack.onUserMuteAudio(uid, muted);
+        }
     };
 
     public RtcEngine getRtcEngine() {
@@ -106,9 +115,13 @@ public class RTCManager {
     public interface IRtcCallBack {
         void onFirstRemoteVideoDecoded(final int uid, int width, int height, int elapsed);
 
+        void onFirstRemoteAudioDecoded(int uid, int elapsed);
+
         void onUserJoined(int uid, int elapsed);
 
         void onUserOffline(int uid, int reason);
+
+        void onUserMuteAudio(int uid, boolean muted);
     }
 
 }

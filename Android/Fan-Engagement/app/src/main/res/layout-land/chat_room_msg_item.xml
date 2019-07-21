@@ -6,12 +6,15 @@
 
     <TextView
         android:id="@+id/tv_chat_room_message_bubble"
-        style="@style/text_edit_view_style"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/chat_room_et_style_2"
+        android:ellipsize="end"
         android:gravity="center_vertical"
+        android:maxLines="100"
         android:paddingLeft="9dp"
         android:paddingRight="9dp"
+        android:scrollHorizontally="false"
+        android:singleLine="false"
         android:textColor="@color/agora_white" />
 </LinearLayout>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -25,40 +26,43 @@
             android:layout_marginBottom="4dp"
             android:layout_weight="1"
             android:background="#333333">
+
             <ImageView
                 android:id="@+id/broadcaster_place_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/broadcaster_place_holder"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:src="@drawable/broadcaster_place_holder" />
 
         </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="4dp">
+            android:layout_marginTop="4dp"
+            android:layout_weight="1">
 
             <FrameLayout
                 android:id="@+id/audience"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#333333"/>
+                android:background="#333333" />
+
             <ImageView
                 android:id="@+id/exit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/exit"
                 android:layout_gravity="right"
-                android:onClick="onExitClicked"/>
+                android:onClick="onExitClicked"
+                android:src="@drawable/exit" />
+
             <ImageView
                 android:id="@+id/plus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/plus"
                 android:layout_gravity="center"
-                android:onClick="onPlusClicked"/>
+                android:onClick="onPlusClicked"
+                android:src="@drawable/plus" />
         </FrameLayout>
 
     </LinearLayout>
@@ -78,6 +82,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="8">
+
+
             <FrameLayout
                 android:id="@+id/streaming"
                 android:layout_width="match_parent"
@@ -86,18 +92,30 @@
 
             </FrameLayout>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/chat_room"
-                android:layout_width="216dp"
-                android:layout_height="120dp"
-                android:layout_gravity="bottom|start"
-                android:layout_marginBottom="8dp"
-                android:paddingLeft="8dp" />
+
+            <ImageView
+                android:id="@+id/fullscreenb_btn"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="bottom|right"
+                android:layout_marginEnd="44dp"
+                android:onClick="onToggleFullscreen"
+                android:scaleType="centerInside"
+                android:src="@drawable/expand_screen" />
+
+            <ImageView
+                android:id="@+id/chat_btn"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="bottom|right"
+                android:onClick="onToggleChatPanel"
+                android:scaleType="centerInside"
+                android:src="@drawable/chat_icon" />
 
         </FrameLayout>
 
         <EditText
-            android:id="@+id/chat"
+            android:id="@+id/chatlayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -109,4 +127,20 @@
             android:layout_marginTop="8dp"/>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chatpanel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chat_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+
 </LinearLayout>

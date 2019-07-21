@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.SurfaceView;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,12 +50,17 @@ public class LiveActivity extends Activity implements RTMManager.IRtmCallBack, R
     private EditText mChat;
     private ImageView mPlus;
     private ImageView mExit;
+    private ImageView mFullscreen;
     private RecyclerView mChatRoom;
+    private LinearLayout mChatPanel;
+    private LinearLayout mPeoplePanel;
     private ImageView mBroadcasterPH;
     private MessageAdapter mMessageAdapter;
     private List<String> mMessageDataSet = new ArrayList<>();
     private boolean mStreamingOn = false;
     private boolean mBroadcasterOn = false;
+    private boolean mChatPanelOn = false;
+    private boolean mFullscreenOn = false;
     private SurfaceView mStreamingView;
     private SurfaceView mBroadcasterView;
 
@@ -76,17 +83,20 @@ public class LiveActivity extends Activity implements RTMManager.IRtmCallBack, R
         mAudienceFL = (FrameLayout) findViewById(R.id.audience);
         mBroadcasterFL = (FrameLayout) findViewById(R.id.broadcaster);
         mStreamingFL = (FrameLayout) findViewById(R.id.streaming);
-        mChat = (EditText) findViewById(R.id.chat);
+        mChat = (EditText) findViewById(R.id.chatlayout);
         mPlus = (ImageView) findViewById(R.id.plus);
         mExit = (ImageView) findViewById(R.id.exit);
+        mFullscreen = (ImageView) findViewById(R.id.fullscreenb_btn);
         mBroadcasterPH = (ImageView) findViewById(R.id.broadcaster_place_holder);
 
-        mChatRoom = (RecyclerView) findViewById(R.id.chat_room);
+        mChatRoom = (RecyclerView) findViewById(R.id.chat_list);
         mChatRoom.setHasFixedSize(true);
         mMessageAdapter = new MessageAdapter(new WeakReference<Context>(this), mMessageDataSet);
         mChatRoom.setAdapter(mMessageAdapter);
         mChatRoom.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mChatRoom.addItemDecoration(new ItemDecor());
+        mChatPanel = (LinearLayout) findViewById(R.id.chatpanel);
+        mPeoplePanel = (LinearLayout) findViewById(R.id.people);
 
         mExit.setVisibility(View.GONE);
         mChat.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -134,6 +144,22 @@ public class LiveActivity extends Activity implements RTMManager.IRtmCallBack, R
         //mRTMManager.sendPeerMessage(Constant.RTM_UID_BROADCASTER, Constant.REQUEST_MESSAGE);
     }
 
+    public void onToggleFullscreen(View v) {
+        int targetWeight = mFullscreenOn ? 1 : 0;
+        int targetIcon = mFullscreenOn ? R.drawable.expand_screen : R.drawable.collapse_screen;
+        mFullscreenOn = !mFullscreenOn;
+        ((LinearLayout.LayoutParams)mPeoplePanel.getLayoutParams()).weight = targetWeight;
+        mPeoplePanel.requestLayout();
+        mFullscreen.setImageDrawable(getResources().getDrawable(targetIcon, getTheme()));
+    }
+
+    public void onToggleChatPanel(View v) {
+        int targetWeight = mChatPanelOn ? 0 : 1;
+        mChatPanelOn = !mChatPanelOn;
+        ((LinearLayout.LayoutParams)mChatPanel.getLayoutParams()).weight = targetWeight;
+        mChatPanel.requestLayout();
+    }
+
     private void showMyself() {
         mPlus.setVisibility(View.GONE);
         mRTCManager.setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
@@ -168,6 +194,13 @@ public class LiveActivity extends Activity implements RTMManager.IRtmCallBack, R
         mRTCManager.leaveAndDestroy();
         mRTMManager.leaveAndReleaseChannel();
 
+    }
+
+    protected void lowerRtmpVolume(boolean lower)
+    {
+        int volume = lower ? 5 : 90;
+        String params = "{\"che.audio.playout.uid.volume\": {\"uid\": 666, \"volume\": " + volume + "}}";
+        mRTCManager.getRtcEngine().setParameters(params);
     }
 
     public void onChannelMessageReceived(final RtmMessage rtmMessage, final RtmChannelMember rtmChannelMember) {
@@ -225,6 +258,30 @@ public class LiveActivity extends Activity implements RTMManager.IRtmCallBack, R
                     mRTCManager.setupRemoteVideo(new VideoCanvas(mBroadcasterView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
                 }
 
+            }
+        });
+    }
+
+    public void onFirstRemoteAudioDecoded(final int uid, int elapsed) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // if someone who's not rtmp streaming comes in with audio, lower rtmp volume
+                if (uid != Constant.UID_STREAMING){
+                    lowerRtmpVolume(true);
+                }
+            }
+        });
+    }
+
+    public void onUserMuteAudio(final int uid, final boolean muted) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // if someone who's not rtmp streaming muted/unmuted himself, update rtmp volume
+                if (uid != Constant.UID_STREAMING){
+                    lowerRtmpVolume(!muted);
+                }
             }
         });
     }
