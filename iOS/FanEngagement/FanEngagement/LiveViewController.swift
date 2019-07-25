@@ -178,6 +178,7 @@ class LiveViewController: UIViewController {
     }
 }
 
+
 extension LiveViewController:UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell:MessageCell = tableView.dequeueReusableCell(withIdentifier: "MSG_CELL") as! MessageCell
@@ -359,8 +360,16 @@ extension LiveViewController: TextVCDelegate {
     
     func textVCWillHide(string: String?) {
         if let text = string {
-            barrageVC?.lauchBarrage(text: text)
-            rtmKit.sendChannelMessage(text)
+            if(text != "") {
+                barrageVC?.lauchBarrage(text: text)
+                rtmKit.sendChannelMessage(text)
+                
+                //show chat message in right panel
+                messages.append(Message(sender: "Me", content: text))
+                chatView.beginUpdates()
+                chatView.insertRows(at: [IndexPath(row: messages.count - 1, section: 0)], with: .automatic)
+                chatView.endUpdates()
+            }
         }
     }
 }

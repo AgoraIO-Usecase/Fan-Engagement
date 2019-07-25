@@ -19,7 +19,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xql-Q7-4LM">
-                                <rect key="frame" x="213.5" y="123.5" width="240" height="128"/>
+                                <rect key="frame" x="213.5" y="79.5" width="240" height="128"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Input channel name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="KGc-zF-HmU">
                                         <rect key="frame" x="0.0" y="20" width="240" height="30"/>
@@ -53,7 +53,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="Xql-Q7-4LM" firstAttribute="centerY" secondItem="oSG-SK-Za1" secondAttribute="centerY" id="41q-zJ-jLd"/>
+                            <constraint firstItem="Xql-Q7-4LM" firstAttribute="centerY" secondItem="oSG-SK-Za1" secondAttribute="centerY" constant="-44" id="41q-zJ-jLd"/>
                             <constraint firstItem="Xql-Q7-4LM" firstAttribute="centerX" secondItem="oSG-SK-Za1" secondAttribute="centerX" id="iRB-FO-65i"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="oSG-SK-Za1"/>

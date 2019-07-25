@@ -99,13 +99,6 @@
                                     <userDefinedRuntimeAttribute type="string" keyPath="hexPlaceholderColorString" value="#999999-Type Sth..."/>
                                 </userDefinedRuntimeAttributes>
                             </textField>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v22-cJ-BOO">
-                                <rect key="frame" x="44" y="0.0" width="808" height="157"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <connections>
-                                    <segue destination="Aw7-jS-2Nb" kind="embed" identifier="liveEmbedBarrage" id="d6k-Rj-g94"/>
-                                </connections>
-                            </containerView>
                             <containerView hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jUp-m9-btC">
                                 <rect key="frame" x="44" y="370" width="808" height="44"/>
                                 <constraints>
@@ -196,7 +189,6 @@
                             <constraint firstAttribute="bottom" secondItem="jUp-m9-btC" secondAttribute="bottom" id="MNk-s3-b8V"/>
                             <constraint firstItem="jUp-m9-btC" firstAttribute="leading" secondItem="pen-dF-dJO" secondAttribute="leading" id="MOx-Vz-Nw0"/>
                             <constraint firstItem="Yq3-1A-4Bq" firstAttribute="top" secondItem="1Y9-Ps-LPD" secondAttribute="top" id="NZa-0R-mVd"/>
-                            <constraint firstItem="pen-dF-dJO" firstAttribute="trailing" secondItem="v22-cJ-BOO" secondAttribute="trailing" id="PRa-cl-SjA"/>
                             <constraint firstItem="MOj-nn-5ml" firstAttribute="bottom" secondItem="Yq3-1A-4Bq" secondAttribute="bottom" constant="-10" id="Sky-5O-pVE"/>
                             <constraint firstItem="hgf-oM-xT1" firstAttribute="trailing" secondItem="Lsz-dT-Ibn" secondAttribute="trailing" id="Vd5-A0-DF5"/>
                             <constraint firstItem="5NM-gV-ygV" firstAttribute="leading" secondItem="1Y9-Ps-LPD" secondAttribute="leading" id="ZTf-0O-2br"/>
@@ -210,13 +202,10 @@
                             <constraint firstItem="Yq3-1A-4Bq" firstAttribute="trailing" secondItem="wlF-3b-nho" secondAttribute="leading" constant="-16" id="j8u-zM-g0t"/>
                             <constraint firstItem="pen-dF-dJO" firstAttribute="trailing" secondItem="rrE-qa-VC8" secondAttribute="trailing" constant="-184" identifier="chat.right.offset" id="jva-ZN-j4z"/>
                             <constraint firstItem="5NM-gV-ygV" firstAttribute="trailing" secondItem="1Y9-Ps-LPD" secondAttribute="trailing" id="k0c-Hh-Vpz"/>
-                            <constraint firstItem="v22-cJ-BOO" firstAttribute="height" secondItem="wDU-Da-ejV" secondAttribute="height" multiplier="0.5" constant="-50" id="lUT-jw-XMv"/>
                             <constraint firstItem="Lsz-dT-Ibn" firstAttribute="width" secondItem="1Y9-Ps-LPD" secondAttribute="width" id="mRt-iR-vrv"/>
                             <constraint firstItem="Yq3-1A-4Bq" firstAttribute="leading" secondItem="1Y9-Ps-LPD" secondAttribute="trailing" constant="16" id="o2n-xx-aCm"/>
-                            <constraint firstItem="v22-cJ-BOO" firstAttribute="leading" secondItem="pen-dF-dJO" secondAttribute="leading" id="rLI-jM-dKd"/>
                             <constraint firstItem="wlF-3b-nho" firstAttribute="centerY" secondItem="rrE-qa-VC8" secondAttribute="centerY" id="rTU-Yu-KnY"/>
                             <constraint firstItem="Lsz-dT-Ibn" firstAttribute="leading" secondItem="1Y9-Ps-LPD" secondAttribute="leading" id="tJ2-If-HVJ"/>
-                            <constraint firstItem="v22-cJ-BOO" firstAttribute="top" secondItem="pen-dF-dJO" secondAttribute="top" id="tQf-o0-8Z6"/>
                             <constraint firstItem="pen-dF-dJO" firstAttribute="trailing" secondItem="jUp-m9-btC" secondAttribute="trailing" id="v3m-jP-mEv"/>
                             <constraint firstItem="5NM-gV-ygV" firstAttribute="bottom" secondItem="1Y9-Ps-LPD" secondAttribute="bottom" id="yLZ-dg-Hxt"/>
                             <constraint firstItem="1Y9-Ps-LPD" firstAttribute="top" secondItem="pen-dF-dJO" secondAttribute="top" constant="20" id="yre-Gb-QDk"/>
@@ -227,7 +216,7 @@
                         <outlet property="broadcasterTagImageView" destination="5NM-gV-ygV" id="HCC-jE-LfD"/>
                         <outlet property="broadcasterView" destination="1Y9-Ps-LPD" id="iWK-Tk-62z"/>
                         <outlet property="chatView" destination="rrE-qa-VC8" id="v4p-q5-6VU"/>
-                        <outlet property="closeButton" destination="QVJ-ep-BwQ" id="bmd-RO-O7K"/>
+                        <outlet property="closeButton" destination="QVJ-ep-BwQ" id="FHH-EZ-uTi"/>
                         <outlet property="fullscreenBtn" destination="MOj-nn-5ml" id="elH-3S-vQB"/>
                         <outlet property="linkHostButton" destination="qtb-R3-NEs" id="5yG-hv-9Z5"/>
                         <outlet property="localView" destination="Lsz-dT-Ibn" id="R6u-hK-pxX"/>
@@ -279,7 +268,7 @@
             <objects>
                 <viewController storyboardIdentifier="BarrageViewController" id="Aw7-jS-2Nb" customClass="BarrageViewController" customModule="Audience" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Gmp-Mf-P2s">
-                        <rect key="frame" x="0.0" y="0.0" width="808" height="157"/>
+                        <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="j60-Yd-757"/>
